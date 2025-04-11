@@ -146,7 +146,7 @@ The goal of this project is to deploy the previous application to a Kubernetes c
 
 ![image](login-nuage-voting-k8s.drawio.svg)
 
-## Preliminary phase: push your Docker images into a GCP container registry
+## Preliminary phase (1): push your Docker images into a GCP container registry
 
 1. In the GCP dashboard, go to *Artifact Registry* and create a *Repository*.
 Give it a name e.g. `voting-image`, and a *region* e.g. `europe-west9`.
@@ -183,6 +183,31 @@ Note that this command can be found in the "Setup Instructions" button in the re
   The suffixes are `vote`, `result`, `worker`, `seed-data`, `postgres-hs` and `redis-hs`.
 
 You will notice that for the `seed-data` image, the public version only sends a total of 300 votes, instead of 3000 previously.
+
+## Preliminary phase (2): build your Docker images in Minikube's Docker runtime
+
+Minikube can store local images to be used in the cluster.
+The subcommand is `minikube image`, and the documentation can be found [here](https://minikube.sigs.k8s.io/docs/handbook/pushing/#1-pushing-directly-to-the-in-cluster-docker-daemon-docker-env). It works similarly to `docker image`, so we can use `minikube image ls` to show the images, `rm` to remove images, etc.
+
+In order to build your images directly onto the Minikube runtime, the command is
+
+```
+minikube image build .
+```
+where `.` is the path containing the Dockerfile.
+The name of the image looks like this `docker.io/library/result:latest`.
+
+In the specification of Pods using local images, you must use the "name" of the image, e.g. `result`, and add the `imagePullPolicy: Never` field indicating Minikube _not_ to pull image from a remote location but use the local image.
+For example in a Deployment,
+
+```
+spec:
+  template:
+    spec:
+      - image: result
+        imagePullPolicy: Never
+```
+
 
 
 ## Mandatory version
