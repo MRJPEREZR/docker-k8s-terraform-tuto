@@ -197,7 +197,7 @@ minikube image build .
 where `.` is the path containing the Dockerfile.
 The name of the image looks like this `docker.io/library/result:latest`.
 
-In the specification of Pods using local images, you must use the "name" of the image, e.g. `result`, and add the `imagePullPolicy: Never` field indicating Minikube _not_ to pull image from a remote location but use the local image.
+In the specification of Pods using local images, you must use the "name" of the image, e.g. `result`, and add the `imagePullPolicy: Never` field indicating Minikube _not_ to pull the image from a remote location but use the local image.
 For example in a Deployment,
 
 ```
