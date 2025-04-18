@@ -222,19 +222,19 @@ Deploy a working application (with temporary database store)
     - Use a `PersistentVolumeClaim`
     - In the corresponding `Deployment`, under `volumeMounts`, there should be `subPath: data`
 * `seed` will be run as a `Job` that is *not restarted*.
+* Add `livenessProbe`s to reflect the `healthchecks` of last week's Docker project.
+    * `result` and `vote` use the `httpGet` probe.
+    * `redis` and `db` use the `exec` probe to run the `healthchecks/{redis.sh,postgres}.sh` scripts.
+        - TIP: You have to create an image for redis and postgres with sh files included, or better use an init container to get [healthchecks files](https://gitlab.imt-atlantique.fr/login-nuage/healthchecks/) inside a shared volume [see this page](https://kubernetes.io/docs/concepts/workloads/pods/init-containers/)
 
 ## Optional extensions
 
 The two extensions are independent.
 
-1. Add `livenessProbe`s to reflect the `healthchecks` of last week's Docker project.
-    * `result` and `vote` use the `httpGet` probe.
-    * `redis` and `db` use the `exec` probe to run the `healthchecks/{redis.sh,postgres}.sh` scripts.
-        - TIP: You have to create an image for redis and postgres with sh files included, or better use an init container to get [healthchecks files](https://gitlab.imt-atlantique.fr/login-nuage/healthchecks/) inside a shared volume [see this page](https://kubernetes.io/docs/concepts/workloads/pods/init-containers/)
-2. Use a `ConfigMap` to pass environment variables to your pods
+1. Use a `ConfigMap` to pass values to your pods as environment variables
     1. create the `ConfigMap` with a manually created manifest
     2. use `Kustomize` to generate the `ConfigMap` 
-3. Use an `HorizontalPodAutoscaler` to automatically scale the number of replicas for `vote`
+2. Use an `HorizontalPodAutoscaler` to automatically scale the number of replicas for `vote`
     * TIP: with Minikube, you will have to run the "metric server": `minikube addons enable metrics-server`
 
 <!-- -->
