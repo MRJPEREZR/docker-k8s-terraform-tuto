@@ -235,6 +235,7 @@ The two extensions are independent.
     1. create the `ConfigMap` with a manually created manifest
     2. use `Kustomize` to generate the `ConfigMap` 
 3. Use an `HorizontalPodAutoscaler` to automatically scale the number of replicas for `vote`
+    * TIP: with Minikube, you will have to run the "metric server": `minikube addons enable metrics-server`
 
 <!-- -->
 
@@ -244,6 +245,9 @@ Print the list of resources we can declare in a manifest, i.e. available values 
 
     kubectl api-resources
 
+Print details about a specific resource or group of resources. For example if an HPA is misbehaving, you may debug with
+
+    kubectl describe hpa
 
 Print the documentation of a resource, i.e. the accepted fields in the manifest
 
