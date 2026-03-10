@@ -98,28 +98,6 @@ The application will be built inside the `/app` directory, launch with `dotnet W
 For the multistage build, use this image: `mcr.microsoft.com/dotnet/runtime:8.0`.
 
 
-### Redis service
-
-This is a simple Redis service. Redis is a NOSQL database software focused on availability used for storing large volumes of data-structures (typically key-value pairs).
-
-use the base image `redis:alpine`
-
-In order to perform healthchecks while Redis is running, there must be a volume attached to the container. You will need to mount local the repo directory `./healthchecks/` into the `/healthchecks/` directory of the container.
-
-The check is done by executing the `redis.sh` script.
-
-
-### PostgreSQL database service
-
-This is a simple PostgreSQL service.
-
-Use the base image `postgres:15-alpine`
-
-The same logic applies for healthchecks, mount a volume, use `postgres.sh` for running checks.
-
-Moreover, in order to persist the data that comes from the votes, you need to create a Docker volume and attach it to the container.
-The volume will be named `db-data` and attached to the `/var/lib/postgresql/data` directory inside the container.
-
 ### Nginx loadbalancer service
 
 This is a simple Nginx service. At its core, Nginx is a web-server but it can also be used for other purposes such as loadbalancing, HTTP cache, reverse proxy, etc.
@@ -131,6 +109,27 @@ Then in the Dockerfile:
 - remove the default Nginx configuration located at `/etc/nginx/conf.d/default.conf`,
 - copy `./nginx/nginx.conf` into the container at the above location.
 
+### Redis service
+
+This is a simple Redis service directly deployed in the `docker-compose.yaml` file without a `Dockerfile`. Redis is a NOSQL database software focused on availability used for storing large volumes of data-structures (typically key-value pairs).
+
+use the base image `redis:alpine`
+
+In order to perform healthchecks while Redis is running, there must be a volume attached to the container. You will need to mount local the repo directory `./healthchecks/` into the `/healthchecks/` directory of the container.
+
+The check is done by executing the `redis.sh` script.
+
+
+### PostgreSQL database service
+
+This is a simple PostgreSQL service directly deployed in the `docker-compose.yaml` file without a `Dockerfile`.
+
+Use the base image `postgres:15-alpine`
+
+The same logic applies for healthchecks, mount a volume, use `postgres.sh` for running checks.
+
+Moreover, in order to persist the data that comes from the votes, you need to create a Docker volume and attach it to the container.
+The volume will be named `db-data` and attached to the `/var/lib/postgresql/data` directory inside the container.
 
 ### Networking
 
@@ -149,12 +148,12 @@ The goal of this project is to deploy the previous application to a Kubernetes c
 ## Preliminary phase (1): push your Docker images into a GCP container registry
 
 1. In the GCP dashboard, go to *Artifact Registry* and create a *Repository*.
-Give it a name e.g. `voting-image`, and a *region* e.g. `europe-west9`.
-Once created, inspect the repository and copy its path, it should look something like `europe-west9-docker.pkg.dev/your-gcp-project/voting-image`.
+Give it a name e.g. `voting-image`, and a *region* e.g. `europe-west3`.
+Once created, inspect the repository and copy its path, it should look something like `europe-west3-docker.pkg.dev/your-gcp-project/voting-image`.
 
 1. Before pushing to the registry, issue the following command in order to authenticate your laptop to the registry:
 ```
-gcloud auth configure-docker europe-west9-docker.pkg.dev
+gcloud auth configure-docker europe-west3-docker.pkg.dev
 ```
 Note that this command can be found in the "Setup Instructions" button in the registry repo.
 
@@ -163,7 +162,7 @@ Note that this command can be found in the "Setup Instructions" button in the re
     * Option 1: Within `docker-compose.yml` file, for each service that `build`s an image, add the `image` field. E.g. for the `result` service:
       ```
       result:
-        image: europe-west9-docker.pkg.dev/your-gcp-project/voting-image/result
+        image: europe-west3-docker.pkg.dev/your-gcp-project/voting-image/result
         build:
           context: ./result
       ```
@@ -171,11 +170,11 @@ Note that this command can be found in the "Setup Instructions" button in the re
 
     * Option 2: For each service we need to build the image and tag the resulting hash. E.g. with `result`:
         * `docker build result/`
-        * `docker tag 0cc5784ad220 europe-west9-docker.pkg.dev/nuage-k8s/login-nuage-images/result`
+        * `docker tag 0cc5784ad220 europe-west3-docker.pkg.dev/nuage-k8s/login-nuage-images/result`
 
 1. Finally, push the images. Either
     * with Docker Compose: `docker compose push`
-    * or with Docker, e.g. `docker push europe-west9-docker.pkg.dev/your-gcp-project/voting-image/result`
+    * or with Docker, e.g. `docker push europe-west3-docker.pkg.dev/your-gcp-project/voting-image/result`
 
 
 * In case you struggle making this work, you can use our public images from Docker Hub during the session (not in the repo you will send us).
@@ -216,7 +215,7 @@ spec:
 
 Deploy a working application (with temporary database store)
 
-* `vote`, `result`, `redis` and `db`, each with a `Deployment` and a `Service`.
+* `vote`, `result`, `redis` and `db`, each with a `Deployment` and a `Service` (choose the good type).
 * `worker` only needs a `Deployment`.
 * Make the data of the `db` persist even if the associated pod is deleted
     - Use a `PersistentVolumeClaim`
@@ -231,11 +230,14 @@ Deploy a working application (with temporary database store)
 
 The two extensions are independent.
 
-1. Use a `ConfigMap` to pass values to your pods as environment variables
+1. Add `livenessProbe`s to reflect the `healthchecks` of last week's Docker project.
+    * `redis` and `db` use the `exec` probe to run the `healthchecks/{redis.sh,postgres}.sh` scripts.
+        - TIP: You have to create an image for redis and postgres with sh files included, or better use an init container to get [healthchecks files](https://gitlab.imt-atlantique.fr/login-nuage/healthchecks/) inside a shared volume [see this page](https://kubernetes.io/docs/concepts/workloads/pods/init-containers/)
+2. Use an `HorizontalPodAutoscaler` to automatically scale the number of replicas for `vote` (make sure to understand monitoring metrics and triggering mechanisms!)
+    * TIP: with Minikube, you will have to run the "metric server": `minikube addons enable metrics-server`
+3. Use a `ConfigMap` to pass values to your pods as environment variables
     1. create the `ConfigMap` with a manually created manifest
     2. use `Kustomize` to generate the `ConfigMap` 
-2. Use an `HorizontalPodAutoscaler` to automatically scale the number of replicas for `vote`
-    * TIP: with Minikube, you will have to run the "metric server": `minikube addons enable metrics-server`
 
 <!-- -->
 
