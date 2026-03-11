@@ -1,4 +1,4 @@
-FROM python:3.9-slim as builder
+FROM python:3.9-slim
 
 WORKDIR /app
 COPY make-data.py ./make-data.py
@@ -11,4 +11,4 @@ RUN apt-get update && \
 COPY generate-votes.sh ./generate-votes.sh
 RUN chmod +x generate-votes.sh
 
-ENTRYPOINT [ "generate-votes.sh" ]
+CMD ["./generate-votes.sh" ]
