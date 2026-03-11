@@ -9,4 +9,7 @@ RUN npm install -g nodemon  && \
     mv /usr/local/app/node_modules /node_modules
 
 ENV PORT=4000
+
+EXPOSE ${PORT}
+
 CMD [ "node", "server.js" ]
