@@ -1,0 +1,56 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: vote
+  labels:
+    app: cloud-project
+spec:
+  type: ClusterIP
+  selector:
+    app: vote
+  ports:
+  - port: 80
+    targetPort: 5000    
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: result
+  labels:
+    app: cloud-project
+spec:
+  type: ClusterIP
+  selector:
+    app: result
+  ports:
+  - port: 8080
+    targetPort: 4000    
+--- 
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis
+  labels:
+    app: cloud-project
+spec:
+  type: ClusterIP
+  selector:
+    app: redis
+  ports:
+  - port: 6379
+    targetPort: 6379
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: db
+  labels:
+    app: cloud-project
+spec:
+  type: ClusterIP
+  selector:
+    app: db
+  ports: 
+  - port: 5432
+    targetPort: 5432
