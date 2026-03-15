@@ -1,24 +1,26 @@
----
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: vote-ingress
-  labels:
-    app: cloud-project
+  name: ingress
 spec:
+  ingressClassName: nginx
   rules:
-  - http:
+
+  - host: vote.local
+    http:
       paths:
-      - path: /vote
+      - path: /
         pathType: Prefix
         backend:
           service:
             name: vote
             port:
               number: 80
-  - http:
+
+  - host: result.local
+    http:
       paths:
-      - path: /result
+      - path: /
         pathType: Prefix
         backend:
           service:
