@@ -3,6 +3,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: db
+  namespace: default
   labels:
     app: cloud-project
 spec:
@@ -25,6 +26,8 @@ spec:
           value: postgres
         - name: POSTGRES_USER
           value: postgres
+        - name: PGDATA
+          value: /var/lib/postgresql/data/pgdata
         volumeMounts:
         - name: db-data
           mountPath: /var/lib/postgresql/data
