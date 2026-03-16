@@ -1,0 +1,39 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: result
+  labels:
+    app: cloud-project
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: result
+  template:
+    metadata:
+      labels:
+        app: result
+    spec:
+      initContainers:
+      - name: wait-for-db
+        image: busybox
+        command:
+        - sh
+        - -c
+        - |
+          until nc -z db 5432; do
+            echo "waiting for db"
+            sleep 2
+          done
+      containers:
+      - name: result
+        image: europe-west3-docker.pkg.dev/cloud-login-489913/cloud-login/result:latest
+        ports:
+          - containerPort: 4000
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 4000
+          initialDelaySeconds: 15
+          periodSeconds: 20

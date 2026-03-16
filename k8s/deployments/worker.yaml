@@ -1,0 +1,31 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: worker
+  labels:
+    app: cloud-project
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: worker
+  template:
+    metadata:
+      labels:
+        app: worker
+    spec:
+      initContainers:
+      - name: wait-for-db
+        image: busybox
+        command:
+        - sh
+        - -c
+        - |
+          until nc -z db 5432; do
+            echo "waiting for db"
+            sleep 2
+          done
+      containers:
+      - name: worker
+        image: europe-west3-docker.pkg.dev/cloud-login-489913/cloud-login/worker:latest

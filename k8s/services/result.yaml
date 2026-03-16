@@ -1,0 +1,14 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: result
+  labels:
+    app: cloud-project
+spec:
+  type: ClusterIP
+  selector:
+    app: result
+  ports:
+  - port: 8080
+    targetPort: 4000
