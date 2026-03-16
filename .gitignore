@@ -1,3 +1,20 @@
-**/.terraform.**
-**/.terraform**
+# Local .terraform directories
+**/.terraform/*
+
+# .tfstate files
 *.tfstate
+*.tfstate.backup
+
+# Crash log files
+crash.log
+
+# Ignore override files
+*.tfoverride
+*.tfoverride.json
+
+# Include tfplan files to ignore plan files
+*.tfplan
+
+# Ignore CLI configuration files
+.terraformrc
+terraform.rc
