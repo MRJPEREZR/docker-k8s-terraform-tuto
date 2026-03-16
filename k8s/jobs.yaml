@@ -1,12 +1,22 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: pi
+  name: seed-data
 spec:
   template:
     spec:
+      initContainers:
+      - name: wait-for-vote
+        image: busybox
+        command:
+        - sh
+        - -c
+        - |
+          until nc -z vote 80; do
+            echo "waiting for vote"
+            sleep 2
+          done
       containers:
       - name: seed
         image: europe-west3-docker.pkg.dev/cloud-login-489913/cloud-login/seed-data:latest
-      restartPolicy: Never
-  backoffLimit: 4
+      restartPolicy: OnFailure
