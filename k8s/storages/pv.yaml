@@ -7,7 +7,9 @@ spec:
     storage: 1Gi
   accessModes:
     - ReadWriteOnce
-  gcePersistentDisk:
-    pdName: gce-disk
-    fsType: ext4
+  storageClassName: "standard-rwo"
   persistentVolumeReclaimPolicy: Retain
+  csi:
+    driver: pd.csi.storage.gke.io
+    volumeHandle: projects/cloud-login-489913/zones/europe-west3-c/disks/gce-disk
+    fsType: ext4
