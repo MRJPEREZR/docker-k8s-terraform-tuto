@@ -23,7 +23,7 @@ resource "docker_image" "postgresql_image" {
 resource "docker_image" "vote_image" {
   name = "vote:latest"
   build {
-    context    = "${path.root}/../../vote"
+    context    = abspath("${path.root}/../vote")
     dockerfile = "Dockerfile"
   }
 }
@@ -31,7 +31,7 @@ resource "docker_image" "vote_image" {
 resource "docker_image" "nginx_image" {
   name = "nginx:latest"
   build {
-    context    = "${path.root}/../../nginx"
+    context    = abspath("${path.root}/../nginx")
     dockerfile = "Dockerfile"
   }
 }
@@ -39,7 +39,7 @@ resource "docker_image" "nginx_image" {
 resource "docker_image" "result_image" {
   name = "result:latest"
   build {
-    context    = "${path.root}/../../result"
+    context    = abspath("${path.root}/../result")
     dockerfile = "Dockerfile"
   }
 }
@@ -47,7 +47,7 @@ resource "docker_image" "result_image" {
 resource "docker_image" "seed_image" {
   name = "seed:latest"
   build {
-    context    = "${path.root}/../../seed-data"
+    context    = abspath("${path.root}/../seed-data")
     dockerfile = "Dockerfile"
   }
 }
@@ -55,7 +55,7 @@ resource "docker_image" "seed_image" {
 resource "docker_image" "worker_image" {
   name = "worker:latest"
   build {
-    context    = "${path.root}/../../worker"
+    context    = abspath("${path.root}/../worker")
     dockerfile = "Dockerfile"
   }
 }
