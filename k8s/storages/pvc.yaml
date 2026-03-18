@@ -5,9 +5,9 @@ metadata:
   name: db-data-pvc
   namespace: default
 spec:
-  storageClassName: standard
   accessModes:
     - ReadWriteOnce
   resources:
     requests:
       storage: 1Gi
+  volumeName: db-data-pv
