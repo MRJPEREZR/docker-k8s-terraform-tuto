@@ -38,10 +38,6 @@ variable "gke_disk_zone" {
   default = "europe-west3-c"
 }
 
-variable "gke_disk_image" {
-  default = "debian-11-bullseye-v20220719"
-}
-
 variable "gke_disk_labels" {
   type = map(string)
   default = {

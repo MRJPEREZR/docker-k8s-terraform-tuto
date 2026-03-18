@@ -30,7 +30,7 @@ resource "google_compute_disk" "default" {
   name                      = var.gke_disk_name
   type                      = var.gke_disk_type
   zone                      = var.gke_disk_zone
-  image                     = var.gke_disk_image
   labels                    = var.gke_disk_labels
   physical_block_size_bytes = var.gke_disk_physical_block_size_bytes
+  size                      = 1
 }

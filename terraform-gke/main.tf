@@ -11,7 +11,6 @@ module "gke" {
   gke_disk_name                      = var.gke_disk_name
   gke_disk_type                      = var.gke_disk_type
   gke_disk_zone                      = var.gke_disk_zone
-  gke_disk_image                     = var.gke_disk_image
   gke_disk_labels                    = var.gke_disk_labels
   gke_disk_physical_block_size_bytes = var.gke_disk_physical_block_size_bytes
 }
